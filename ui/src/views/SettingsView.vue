@@ -7,25 +7,57 @@ const apiKey = ref('')
 const model = ref('dall-e-3')
 const size = ref('1792x1024')
 const loading = ref(false)
+const saving = ref(false)
 
 onMounted(() => {
-  // 加载配置
-  loadConfig()
+  loadSettings()
 })
 
-async function loadConfig() {
-  // TODO: 从后端加载配置
-}
-
-async function saveConfig() {
+async function loadSettings() {
   loading.value = true
   try {
-    // TODO: 保存配置到后端
-    toast.success('配置保存成功')
+    const response = await fetch('/apis/ai-cover/settings')
+    if (response.ok) {
+      const data = await response.json()
+      apiUrl.value = data.apiUrl || ''
+      apiKey.value = data.apiKey || ''
+      model.value = data.model || 'dall-e-3'
+      size.value = data.size || '1792x1024'
+    }
   } catch (error) {
-    toast.error('配置保存失败')
+    console.error('Failed to load settings:', error)
+    toast.error('加载配置失败')
   } finally {
     loading.value = false
+  }
+}
+
+async function saveSettings() {
+  saving.value = true
+  try {
+    const response = await fetch('/apis/ai-cover/settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        apiUrl: apiUrl.value,
+        apiKey: apiKey.value,
+        model: model.value,
+        size: size.value,
+      }),
+    })
+    
+    if (response.ok) {
+      toast.success('配置保存成功')
+    } else {
+      toast.error('配置保存失败')
+    }
+  } catch (error) {
+    console.error('Failed to save settings:', error)
+    toast.error('配置保存失败')
+  } finally {
+    saving.value = false
   }
 }
 </script>
@@ -34,7 +66,11 @@ async function saveConfig() {
   <div class="settings-container">
     <h2 class="settings-title">AI 封面生成器配置</h2>
     
-    <div class="settings-form">
+    <div v-if="loading" class="loading">
+      加载中...
+    </div>
+    
+    <div v-else class="settings-form">
       <div class="form-item">
         <label>API 地址</label>
         <input v-model="apiUrl" type="text" placeholder="https://api.openai.com/v1/images/generations" />
@@ -63,8 +99,8 @@ async function saveConfig() {
       </div>
       
       <div class="form-actions">
-        <button @click="saveConfig" :disabled="loading" class="save-btn">
-          {{ loading ? '保存中...' : '保存配置' }}
+        <button @click="saveSettings" :disabled="saving" class="save-btn">
+          {{ saving ? '保存中...' : '保存配置' }}
         </button>
       </div>
     </div>
@@ -81,6 +117,12 @@ async function saveConfig() {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 24px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
 }
 
 .settings-form {

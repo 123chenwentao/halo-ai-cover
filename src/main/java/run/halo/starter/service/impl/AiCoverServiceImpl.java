@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import run.halo.starter.config.AiCoverProperties;
 import run.halo.starter.service.AiCoverService;
+import run.halo.starter.service.PluginSettingService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,12 +17,12 @@ import java.util.Map;
 @Service
 public class AiCoverServiceImpl implements AiCoverService {
 
-    private final AiCoverProperties properties;
+    private final PluginSettingService settingService;
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
 
-    public AiCoverServiceImpl(AiCoverProperties properties) {
-        this.properties = properties;
+    public AiCoverServiceImpl(PluginSettingService settingService) {
+        this.settingService = settingService;
         this.webClient = WebClient.builder().build();
         this.objectMapper = new ObjectMapper();
     }
@@ -30,12 +30,23 @@ public class AiCoverServiceImpl implements AiCoverService {
     @Override
     public String generateCover(String content) {
         try {
-            // 1. 分析文章内容，生成提示词
+            // 1. 获取配置
+            String apiUrl = settingService.getApiUrl().block();
+            String apiKey = settingService.getApiKey().block();
+            String model = settingService.getModel().block();
+            String size = settingService.getSize().block();
+
+            // 2. 检查配置
+            if (apiKey == null || apiKey.isEmpty()) {
+                throw new RuntimeException("API Key 未配置");
+            }
+
+            // 3. 生成提示词
             String prompt = generatePrompt(content);
-            
-            // 2. 调用 AI API 生成图片
-            String imageUrl = callAiApi(prompt);
-            
+
+            // 4. 调用 AI API
+            String imageUrl = callAiApi(apiUrl, apiKey, model, size, prompt);
+
             return imageUrl;
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,32 +60,32 @@ public class AiCoverServiceImpl implements AiCoverService {
      */
     private String generatePrompt(String content) {
         // 简单提取前200个字符作为摘要
-        String摘要 = content.length() > 200 ? content.substring(0, 200) : content;
+        String summary = content.length() > 200 ? content.substring(0, 200) : content;
         
         // 生成提示词
         return String.format(
             "Generate a professional blog cover image for an article about: %s. " +
             "The image should be modern, clean, and visually appealing. " +
             "Use a color scheme that conveys professionalism and creativity.",
-            摘要
+            summary
         );
     }
 
     /**
      * 调用 AI API 生成图片
      */
-    private String callAiApi(String prompt) throws Exception {
+    private String callAiApi(String apiUrl, String apiKey, String model, String size, String prompt) throws Exception {
         // 构建请求体
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", properties.getModel());
+        requestBody.put("model", model);
         requestBody.put("prompt", prompt);
         requestBody.put("n", 1);
-        requestBody.put("size", properties.getSize());
+        requestBody.put("size", size);
 
         // 发送请求
         String response = webClient.post()
-            .uri(properties.getApiUrl())
-            .header("Authorization", "Bearer " + properties.getApiKey())
+            .uri(apiUrl)
+            .header("Authorization", "Bearer " + apiKey)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(requestBody)
             .retrieve()

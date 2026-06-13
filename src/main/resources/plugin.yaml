@@ -20,3 +20,43 @@ spec:
   license:
     - name: "GPL-3.0"
       url: "https://github.com/123chenwentao/halo-ai-cover/blob/main/LICENSE"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: SettingDefinition
+metadata:
+  name: halo-ai-cover-settings
+spec:
+  displayName: "AI 封面生成器设置"
+  description: "配置 AI 封面生成器的 API 设置"
+  formSchema:
+    - name: apiUrl
+      label: "API 地址"
+      type: text
+      placeholder: "https://api.openai.com/v1/images/generations"
+      required: true
+    - name: apiKey
+      label: "API Key"
+      type: password
+      placeholder: "请输入 API Key"
+      required: true
+    - name: model
+      label: "模型"
+      type: select
+      options:
+        - label: "DALL-E 3"
+          value: "dall-e-3"
+        - label: "DALL-E 2"
+          value: "dall-e-2"
+      default: "dall-e-3"
+    - name: size
+      label: "图片尺寸"
+      type: select
+      options:
+        - label: "1792x1024 (横版)"
+          value: "1792x1024"
+        - label: "1024x1792 (竖版)"
+          value: "1024x1792"
+        - label: "1024x1024 (方形)"
+          value: "1024x1024"
+      default: "1792x1024"
