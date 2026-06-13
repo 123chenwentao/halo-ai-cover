@@ -1,9 +1,13 @@
-# plugin-starter
+# halo-ai-cover
 
-Halo 2.x 插件开发快速开始模板。
+Halo 2.x AI 封面生成器插件 - 根据文章内容自动生成 AI 封面图片。
 
-> [!WARNING]
-> 此项目将在未来被标记为过时，后续建议使用 [halo-dev/create-halo-plugin](https://github.com/halo-dev/create-halo-plugin) 以交互式的方式创建 Halo 插件项目。
+## 功能特性
+
+- 根据文章内容自动生成封面图片
+- 支持多种 AI 绘图模型（DALL-E 3、DALL-E 2）
+- 可配置 API 地址和密钥
+- 支持多种图片尺寸
 
 ## 开发环境
 
@@ -19,15 +23,11 @@ Halo 2.x 插件开发快速开始模板。
 克隆项目：
 
 ```bash
-git clone git@github.com:halo-sigs/plugin-starter.git
-
-# 或者当你 fork 之后
-
-git clone git@github.com:{your_github_id}/plugin-starter.git
+git clone https://github.com/123chenwentao/halo-ai-cover.git
 ```
 
 ```bash
-cd path/to/plugin-starter
+cd path/to/halo-ai-cover
 ```
 
 ### 运行方式 1（推荐）
@@ -73,7 +73,27 @@ halo:
   plugin:
     runtime-mode: development
     fixedPluginPath:
-      - "/path/to/plugin-starter"
+      - "/path/to/halo-ai-cover"
 ```
 
 最后重启 Halo 项目即可。
+
+## 配置说明
+
+在插件配置页面可以设置：
+
+- **API 地址**: AI 绘图 API 的地址
+- **API Key**: API 密钥
+- **模型**: 选择 AI 绘图模型
+- **图片尺寸**: 生成图片的尺寸
+
+## 使用方法
+
+1. 安装并启用插件
+2. 在插件配置页面设置 API 信息
+3. 编辑文章时，点击"生成 AI 封面"按钮
+4. 插件会根据文章内容自动生成封面图片
+
+## 许可证
+
+[GPL-3.0](LICENSE)

@@ -5,12 +5,8 @@ import run.halo.app.plugin.BasePlugin;
 import run.halo.app.plugin.PluginContext;
 
 /**
- * <p>Plugin main class to manage the lifecycle of the plugin.</p>
- * <p>This class must be public and have a public constructor.</p>
- * <p>Only one main class extending {@link BasePlugin} is allowed per plugin.</p>
- *
- * @author guqing
- * @since 1.0.0
+ * Halo AI Cover Plugin
+ * 根据文章内容自动生成 AI 封面
  */
 @Component
 public class StarterPlugin extends BasePlugin {
@@ -21,11 +17,11 @@ public class StarterPlugin extends BasePlugin {
 
     @Override
     public void start() {
-        System.out.println("插件启动成功！");
+        System.out.println("Halo AI Cover 插件启动成功！");
     }
 
     @Override
     public void stop() {
-        System.out.println("插件停止！");
+        System.out.println("Halo AI Cover 插件停止！");
     }
 }
